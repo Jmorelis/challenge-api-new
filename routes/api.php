@@ -9,12 +9,10 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
     
-    // Devuelve la info del usuario logueado
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
 
-    // CRUD de artículos (Ahora SI está protegido)
     Route::apiResource('articles', ArticleController::class);
     
 });
