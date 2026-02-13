@@ -14,7 +14,7 @@ class UserController extends Controller
     {
         try {
 
-//Faltan validaciones
+            //Faltan validaciones
             $user = User::create([
                 'name' => $request->title,
                 'email' => $request->content,

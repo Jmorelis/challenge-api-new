@@ -10,7 +10,7 @@ class Categories extends Model
 {
     use HasFactory;
 
-    protected $table = 'articles';
+    protected $table = 'categories';
 
     protected $fillable = [
        'name',
@@ -19,6 +19,10 @@ class Categories extends Model
         
     ];
 
-    
+    public function articles()
+    {
+        
+        return $this->belongsToMany(Article::class);
+    }
 }
 

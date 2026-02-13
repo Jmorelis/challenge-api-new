@@ -23,7 +23,7 @@ class CategoriesController extends Controller
 
             return response()->json([
                 'message' => 'Categoria resgistrado OK',
-                'categoria' => $categoria->id,
+                'categoria' => $categories->id,
             ], 201);
 
         } catch (QueryException $e) {
@@ -40,6 +40,26 @@ class CategoriesController extends Controller
         }
     }
 
+
+
+    public function destroy(Category $category): JsonResponse
+    {
+       
+        if ($category->articles()->exists()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No se puede eliminar la categoría porque tiene artículos vinculados.',
+                'code' => 'CAT 1'
+            ], 422); 
+        }
+
+        $category->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Categoría eliminada correctamente.'
+        ], 200);
+    }
     
 
 }

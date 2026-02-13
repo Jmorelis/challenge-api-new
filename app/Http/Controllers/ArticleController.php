@@ -3,61 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\Services\ArticleServices;
+use App\Repositories\Interfaces\ArticleRepositoryInterface; 
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Http\Requests\StoreArticleRequest;
+
 use Exception;
 
 class ArticleController extends Controller
 {
-    public function store(Request $request)
+    protected $articleServices;
+    protected $articleRepo;
+
+    public function __construct(ArticleServices $articleServices, ArticleRepositoryInterface $articleRepo)
     {
-        try {
-
-
-            $article = Article::create([
-                'title' => $request->title,
-                'content' => $request->content,
-                // 'slug' => \Str::slug($request->title),
-                'status' => $request->status ?? 'draft',
-                'published_at' => $request->status === 'published' ? now() : null,
-                'user_id' => 1 
-            ]);
-
-            return response()->json([
-                'message' => 'Articulo resgistrado OK',
-                'articulo_id' => $article->id,
-            ], 201);
-
-        } catch (QueryException $e) {
-            return response()->json([
-                'message' => 'Database error',
-                'error' => $e->getMessage(),
-            ], 500);
-
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Unexpected error',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        $this->articleServices = $articleServices;
+        $this->articleRepo = $articleRepo;
     }
 
     public function index()
     {
         try {
-            $articles = Article::with(['user_id', 'categories'])->get(); //user_id aauthor
+            $articles = $this->articleRepo->all();
 
              return response()->json([
                 'message' => 'listado ok',
-                'articulo' => $articles,
+                'articulos' => $articles,
             ], 200);
-
-        } catch (QueryException $e) {
-            return response()->json([
-                'message' => 'Database error',
-                'error' => $e->getMessage(),
-            ], 500);
 
         } catch (Exception $e) {
             return response()->json([
@@ -65,95 +39,79 @@ class ArticleController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
-            
     }
 
     public function show($id)
     {
         try {
-
-            $article = Article::with(['user_id', 'categories'])->findOrFail($id);
+            $article = $this->articleRepo->find($id);
 
             return response()->json([
                 'message' => 'Articulo encontrado',
                 'articulo' => $article,
             ], 200);
 
-        } catch (QueryException $e) {
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Articulo no encontrado'], 404);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Error inesperado'], 500);
+        }
+    }
+
+    public function store(StoreArticleRequest $request)
+    {
+        try {
+            $article = $this->articleServices->createArticle($request->validated());
 
             return response()->json([
-                'message' => 'Database error',
-                'error' => $e->getMessage(),
-            ], 500);
+                'message' => 'Articulo registrado OK',
+                'articulo_id' => $article->id,
+                'articulo' => $article
+            ], 201);
 
         } catch (Exception $e) {
-
             return response()->json([
-                'message' => 'Articulo no encontrado',
-                'error' => $e->getMessage(),
-            ], 404);
+                'message' => $e->getMessage(), 
+            ], $e->getCode() ?: 500);
         }
     }
 
     public function update(Request $request, $id)
     {
         try {
+            $article = $this->articleRepo->find($id);
 
-            $article = Article::findOrFail($id);
-
-            $article->update([
-                'title' => $request->title ?? $article->title,
-                'content' => $request->content ?? $article->content,
-                'status' => $request->status ?? $article->status,
-                'published_at' => $request->status === 'published' ? now() : $article->published_at,
-            ]);
+            $updatedArticle = $this->articleServices->updateArticle($article, $request->all());
 
             return response()->json([
                 'message' => 'Articulo actualizado correctamente',
-                'articulo' => $article,
+                'articulo' => $updatedArticle,
             ], 200);
 
-        } catch (QueryException $e) {
-
-            return response()->json([
-                'message' => 'Database error',
-                'error' => $e->getMessage(),
-            ], 500);
-
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Articulo no encontrado'], 404);
         } catch (Exception $e) {
-
             return response()->json([
-                'message' => 'Articulo no encontrado',
-                'error' => $e->getMessage(),
-            ], 404);
+                'message' => 'Error al actualizar',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
     public function destroy($id)
-{
-    try {
+    {
+        try {
+            $article = $this->articleRepo->find($id);
+            $this->articleRepo->delete($article);
 
-        $article = Article::findOrFail($id);
-        $article->delete();
+            return response()->json([
+                'message' => 'Articulo eliminado correctamente',
+            ], 200);
 
-        return response()->json([
-            'message' => 'Articulo eliminado correctamente',
-        ], 200);
-
-    } catch (QueryException $e) {
-
-        return response()->json([
-            'message' => 'Database error',
-            'error' => $e->getMessage(),
-        ], 500);
-
-    } catch (Exception $e) {
-
-        return response()->json([
-            'message' => 'Articulo no encontrado',
-            'error' => $e->getMessage(),
-        ], 404);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['message' => 'Articulo no encontrado'], 404);
+        } catch (Exception $e) {
+            return response()->json(['message' => 'Error al eliminar'], 500);
+        }
     }
-}
-
 }

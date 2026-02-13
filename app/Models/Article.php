@@ -38,5 +38,16 @@ class Article extends Model
             $article->slug = $slug;
         });
     }
+
+    public function categories()
+    {
+        // 'article_category' es el nombre de tu tabla pivot
+        return $this->belongsToMany(Categories::class, 'article_category', 'article_id', 'category_id');
+    }
+
+    public function user() 
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
 
