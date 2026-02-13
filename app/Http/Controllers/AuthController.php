@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    // La función DEBE estar dentro de estas llaves
+   
     public function login(Request $request) 
     {
         $request->validate([

@@ -5,15 +5,16 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\AuthController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
-
-Route::apiResource('articles', ArticleController::class);
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('articles', ArticleController::class);
-});
+    
+    // Devuelve la info del usuario logueado
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 
-Route::post('/login', [AuthController::class, 'login']);
+    // CRUD de artículos (Ahora SI está protegido)
+    Route::apiResource('articles', ArticleController::class);
+    
+});
