@@ -54,9 +54,8 @@ class ArticleServices
             $data['published_at'] = now();
         }
 
+
         $this->repository->update($article, $data);
-
-
 
         if (isset($data['category_ids'])) {
             $this->repository->syncCategories($article, $data['category_ids']);

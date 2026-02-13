@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categories;
+use App\Services\CategoriesServices;
+use App\Repositories\Interfaces\CategoriesRepositoryInterface; 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\QueryException;
@@ -10,6 +13,34 @@ use Exception;
 
 class CategoriesController extends Controller
 {
+
+    protected $categoriesServices;
+    protected $categoriesRepo;
+
+    public function __construct(CategoriesServices $categoriesServices, CategoriesRepositoryInterface $categoriesRepo)
+    {
+        $this->categoriesServices = $categoriesServices;
+        $this->categoriesRepo = $categoriesRepo;
+    }
+
+    public function index()
+    {
+        try {
+            $categories = $this->categoriesRepo->all();
+
+             return response()->json([
+                'message' => 'listado ok',
+                'categorias' => $categories,
+            ], 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Unexpected error',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function store(Request $request)
     {
         try {
