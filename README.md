@@ -58,15 +58,3 @@ El slug se genera automáticamente utilizando eventos del modelo (boot() + creat
 Se utiliza findOrFail() para manejo automático de 404.
 
 Se implementó relación many-to-many entre artículos y categorías mediante tabla pivot.
-
-
-## Posibles Mejoras Futuras
-
-Implementación de más validaciones con FormRequest
-Paginación y filtros avanzados
-Tests automatizados
-
-👨‍💻 Autor
-
-Juan Ignacio Morelis
-Fullstack Developer | PHP | Laravel
