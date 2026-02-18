@@ -21,59 +21,12 @@ API REST desarrollada en Laravel para la gestión de artículos y categorías, i
 - Uso de Eloquent ORM y relaciones
 - Proyecto dockerizado para ejecución simple
 
-## Cómo Ejecutar el Proyecto
 
-- Clonar el repositorio
-    git clone https://github.com/TU_USUARIO/TU_REPO.git
-    cd TU_REPO
-- Levantar entorno Docker
-    docker compose up -d --build
-
-Esto levantará:
-
-- Contenedor app (Laravel)
-
-- Contenedor mysql
-
-Instalar dependencias
-
-Entrar al contenedor:
-
-    docker exec -it laravel_app bash
-
-Dentro del contenedor:
-
-    composer install
-    Configurar entorno
-
-    Copiar archivo de entorno:
-
-    cp .env.example .env
-
-## Verificar configuración de base de datos:
-
-DB_CONNECTION=mysql
-DB_HOST=mysql
-DB_PORT=3306
-DB_DATABASE=laravel
-DB_USERNAME=root
-DB_PASSWORD=root
-
-## Generar key de aplicación:
-
-php artisan key:generate
- - Ejecutar migraciones
-php artisan migrate
- - Acceso a la API
-
-La API estará disponible en:
-
-http://localhost:8000/api
 
 Endpoints Disponibles
 ## Articles
 - Método	Endpoint	Descripción
-    GET	/api/articles	Listar artículos
+    GET	/api/articles	Listar artículos        
     GET	/api/articles/{id}	Obtener artículo
     POST	/api/articles	Crear artículo
     PUT	/api/articles/{id}	Actualizar artículo
